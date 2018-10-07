@@ -1,7 +1,12 @@
 # Naming Rules for Orderly
-# Classes:
-# Variables:
-# UI Components:
-# Activities:
-# Fragments:
-# Services:
+# Classes: class names start with capital letters and camel case if more than one word eg. [MyNewClass]
+# Interfaces: start with capital "I" eg. [IModel]
+# Variables: lower case + camel case eg. [myVariable]
+# UI Components: start with component type prefix, follow with its name
+# UI Prefixes:{
+# Button: [Btn_], Label [Lb_], ImageView [ImV_], CheckBox [ChB_]...
+# Layout: [Lay_]
+# }
+# Activities: [Act_]
+# Fragments: [Frag_]
+# Services: [Serv_]
