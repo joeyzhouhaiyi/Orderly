@@ -18,14 +18,32 @@
             android:layout_height="60dp"
             android:background="@color/colorPrimary"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
-
+        <TextView
+            android:id="@+id/tv_noProject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="100dp"
+            android:text="@string/tv_noProject"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="@dimen/defaultTextSize"/>
+        <TextView
+            android:id="@+id/tv_createProject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="60dp"
+            android:text="@string/tv_createProject"
+            android:textColor="@color/white"
+            android:textSize="16sp"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/newProject"
             android:textColor="@color/white"
-            android:textSize="25dp"
+            android:textSize="25sp"
             android:id="@+id/btn_newProject"
             android:elevation="6dp"
             style="@style/Btn_newProject"

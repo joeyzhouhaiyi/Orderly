@@ -1,6 +1,8 @@
-package app.haitech.orderly;
+package app.haitech.orderly.MainScreen;
 
+import android.content.DialogInterface;
 import android.nfc.Tag;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -12,19 +14,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.support.design.widget.NavigationView;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import app.haitech.orderly.R;
 
 public class Act_MainScreen extends AppCompatActivity {
     String TAG = "Act_MainScreen";
     private DrawerLayout mDrawerLayout;
     private static String projectName;
-
+    Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sty_main_screen);
 
         // Toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
@@ -92,7 +99,33 @@ public class Act_MainScreen extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // New Project Button Clicked
     public void OnClickNewProject(View v){
+        final TextView tv1 = findViewById(R.id.tv_createProject);
+        final TextView tv2 = findViewById(R.id.tv_noProject);
+        final Button bt = findViewById(R.id.btn_newProject);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(R.layout.sty_dialog_new_project);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                EditText et = findViewById(R.id.et_projectName);
+                String content = et.getText().toString();
+                if(content!=null) {
+                    tv1.setVisibility(View.INVISIBLE);
+                    tv2.setVisibility(View.INVISIBLE);
+                    bt.setVisibility(View.INVISIBLE);
+                    toolbar.setTitle(content);
+                }
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        builder.create().show();
     }
 }

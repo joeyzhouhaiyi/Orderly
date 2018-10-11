@@ -7,7 +7,10 @@
     <string name="export">Export</string>
     <string name="tag">Tags</string>
     <string name="newProject">New Project</string>
-
-
-
+    <string name="tv_noProject">You do not have any project</string>
+    <string name="tv_createProject">Why not create one?</string>
+    <string name="tv_dialog_title_create_new_project">NEW PROJECT</string>
+    <string name="tv_enter_a_name">Project Name:</string>
+    <string name="ok">OK</string>
+    <string name="cancel">CANCEL</string>
 </resources>
