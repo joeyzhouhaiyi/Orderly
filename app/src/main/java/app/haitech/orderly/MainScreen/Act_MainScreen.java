@@ -1,5 +1,7 @@
 package app.haitech.orderly.MainScreen;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.nfc.Tag;
 import android.support.v7.app.AlertDialog;
@@ -10,10 +12,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.design.widget.NavigationView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -25,11 +29,12 @@ public class Act_MainScreen extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private static String projectName;
     Toolbar toolbar;
+    private Context mContext;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sty_main_screen);
-
+        mContext=this;
         // Toolbar
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -100,32 +105,54 @@ public class Act_MainScreen extends AppCompatActivity {
     }
 
     // New Project Button Clicked
-    public void OnClickNewProject(View v){
-        final TextView tv1 = findViewById(R.id.tv_createProject);
-        final TextView tv2 = findViewById(R.id.tv_noProject);
-        final Button bt = findViewById(R.id.btn_newProject);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(R.layout.sty_dialog_new_project);
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+    public void OnClickNewProject(View v) {
+        CreateDialog();
+    }
 
+    /**
+     * Create the dialog where the user can
+     * enter a name for the new project
+     */
+    private void CreateDialog()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        View v = inflater.inflate(R.layout.sty_dialog_new_project, null);
+        Button btn_ok = (Button)v.findViewById(R.id.btn_ok);
+        Button btn_cancel = (Button)v.findViewById(R.id.btn_cancel);
+        final EditText et_proj_name = (EditText) v.findViewById(R.id.et_projectName);//enter proj name
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+        dialog.getWindow().setContentView(v);
+
+        // OK button callback
+        btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                EditText et = findViewById(R.id.et_projectName);
-                String content = et.getText().toString();
-                if(content!=null) {
-                    tv1.setVisibility(View.INVISIBLE);
-                    tv2.setVisibility(View.INVISIBLE);
-                    bt.setVisibility(View.INVISIBLE);
-                    toolbar.setTitle(content);
-                }
+            public void onClick(View view) {
+                String name = et_proj_name.getText().toString();
+                if(!name.isEmpty())
+                    toolbar.setTitle(name);
+                dialog.dismiss();
             }
         });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
 
+        // Cancel button callback
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
             }
         });
-        builder.create().show();
+
+        // On focus change show keyboard
+        // fix the issue where keyboard wont pop up
+        et_proj_name.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if(b)
+                    dialog.getWindow()
+                            .clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+            }
+        });
     }
 }
