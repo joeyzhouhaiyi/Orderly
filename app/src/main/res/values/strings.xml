@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Orderly</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="storage">Storage</string>
     <string name="export">Export</string>
@@ -10,7 +8,10 @@
     <string name="tv_noProject">You do not have any project</string>
     <string name="tv_createProject">Why not create one?</string>
     <string name="tv_dialog_title_create_new_project">NEW PROJECT</string>
+    <string name="tv_dialog_title_choose_project">OPEN PROJECT</string>
     <string name="tv_enter_a_name">Project Name:</string>
     <string name="ok">OK</string>
     <string name="cancel">CANCEL</string>
+    <string name="open">OPEN</string>
+    <string name="New">NEW</string>
 </resources>
