@@ -3,6 +3,7 @@ package app.haitech.orderly.MainScreen;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.nfc.Tag;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -24,6 +25,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import app.haitech.orderly.Dashboard.Act_Dashboard;
 import app.haitech.orderly.R;
 
 public class Act_MainScreen extends AppCompatActivity
@@ -107,7 +109,7 @@ public class Act_MainScreen extends AppCompatActivity
                 }
         );
         boolean hasExistingProject = CheckIfHasProject();
-        hasExistingProject=true;
+        //hasExistingProject=true;
         if(hasExistingProject)
         {
             CreateChooseProjectDialog();
@@ -184,7 +186,12 @@ public class Act_MainScreen extends AppCompatActivity
                 public void onClick(View view) {
                     projectName = et_proj_name.getText().toString();
                     if (!projectName.isEmpty()) {
+                        Intent intent = new Intent(Act_MainScreen.this, Act_Dashboard.class);
+                        intent.putExtra("projectName", projectName);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
                         dialog.dismiss();
+                        Act_MainScreen.this.finish();
                     }else{
                         et_proj_name.setHint("Name cannot be empty!");
                     }
@@ -212,6 +219,10 @@ public class Act_MainScreen extends AppCompatActivity
         }
     }
     //----------------------------------------------------------------------------------------
+
+    /**
+     * If the project Exist, choose a project
+     */
     private void CreateChooseProjectDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         LayoutInflater inflater = LayoutInflater.from(mContext);
