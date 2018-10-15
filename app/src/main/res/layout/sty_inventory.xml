@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <!-- Layout to contain contents of main body of screen (drawer will slide over this) -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="10"
+        android:background="@drawable/background_gradient">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
+
+        <!--Tag filters and sort bar-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:orientation="horizontal"
+            android:background="@color/colorPrimaryDark"
+            android:weightSum="6">
+            <TextView
+                android:text="Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <Spinner
+                android:id="@+id/spinner_tag_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:theme="@android:style/Widget.Holo.Light.Spinner"
+                android:background="@color/white"
+                android:layout_weight="2"></Spinner>
+            <TextView
+                android:text="Sort By"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <Spinner
+                android:id="@+id/spinner_sort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:theme="@android:style/Widget.Holo.Light.Spinner"
+                android:background="@color/white"
+                android:layout_weight="2"></Spinner>
+        </LinearLayout>
+        <!--END-->
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="8.5"></android.support.v7.widget.RecyclerView>
+
+    </LinearLayout>
+
+
+    <!-- Container for contents of drawer - use NavigationView to make configuration easier -->
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:menu="@menu/drawer_items_inventory"
+        app:headerLayout="@layout/nav_header"/>
+
+</android.support.v4.widget.DrawerLayout>

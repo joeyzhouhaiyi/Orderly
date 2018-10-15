@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <group android:checkableBehavior="single">
+    <group>
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_gallery"
-            android:title="@string/storage" />
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_gallery"
-            android:title="@string/export" />
-        <item
-            android:id="@+id/nav_tags"
-            android:icon="@drawable/ic_tag"
-            android:title="@string/tag"
-            />
+            android:id="@+id/nav_add_new_project"
+            android:icon="@drawable/ic_add_circle"
+            android:title="@string/newProject" />
     </group>
 </menu>

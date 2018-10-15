@@ -25,6 +25,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import app.haitech.orderly.Dashboard.Act_Dashboard;
 import app.haitech.orderly.R;
 
@@ -35,7 +37,7 @@ public class Act_MainScreen extends AppCompatActivity
     private DrawerLayout mDrawerLayout;
     public static String projectName = "";
     private Context mContext;
-
+    private int checkedNavItem =0;
     //Views
     Toolbar toolbar;
     TextView tv_no_project;
@@ -67,14 +69,8 @@ public class Act_MainScreen extends AppCompatActivity
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem)
                     {
-                        // set item as selected to persist highlight
-                        menuItem.setChecked(true);
-                        // close drawer when item is tapped
                         mDrawerLayout.closeDrawers();
-
-                        // Add code here to update the UI based on the item selected
-                        // For example, swap UI fragments here
-
+                        checkedNavItem = menuItem.getItemId();
                         return true;
                     }
                 });
@@ -84,28 +80,20 @@ public class Act_MainScreen extends AppCompatActivity
                 new DrawerLayout.DrawerListener()
                 {
                     @Override
-                    public void onDrawerSlide(View drawerView, float slideOffset)
-                    {
-                        // Respond when the drawer's position changes
-                    }
+                    public void onDrawerSlide(View drawerView, float slideOffset){}
 
                     @Override
-                    public void onDrawerOpened(View drawerView)
-                    {
-                        // Respond when the drawer is opened
-                    }
+                    public void onDrawerOpened(View drawerView){}
 
                     @Override
                     public void onDrawerClosed(View drawerView)
                     {
-                        // Respond when the drawer is closed
+                        if(checkedNavItem == R.id.nav_add_new_project)
+                            CreateNewProjectDialog();
                     }
 
                     @Override
-                    public void onDrawerStateChanged(int newState)
-                    {
-                        // Respond when the drawer motion state changes
-                    }
+                    public void onDrawerStateChanged(int newState){}
                 }
         );
         boolean hasExistingProject = CheckIfHasProject();
@@ -163,6 +151,7 @@ public class Act_MainScreen extends AppCompatActivity
         CreateNewProjectDialog();
     }
     //---------------------------------------------------------------------------
+
     /**
      * Create the dialog where the user can
      * enter a name for the new project
@@ -176,6 +165,7 @@ public class Act_MainScreen extends AppCompatActivity
             Button btn_ok = (Button) v.findViewById(R.id.btn_ok);
             Button btn_cancel = (Button) v.findViewById(R.id.btn_cancel);
             final EditText et_proj_name = (EditText) v.findViewById(R.id.et_projectName);//enter proj name
+            final TextView tv_hint = (TextView)v.findViewById(R.id.tv_hint_text);
             final AlertDialog dialog = builder.create();
             dialog.show();
             dialog.getWindow().setContentView(v);
@@ -193,7 +183,8 @@ public class Act_MainScreen extends AppCompatActivity
                         dialog.dismiss();
                         Act_MainScreen.this.finish();
                     }else{
-                        et_proj_name.setHint("Name cannot be empty!");
+                        tv_hint.setText("* Name cannot be empty!");
+                        tv_hint.setTextColor(getResources().getColor(R.color.red));
                     }
                 }
             });
@@ -235,7 +226,7 @@ public class Act_MainScreen extends AppCompatActivity
             Button btn_open = (Button) v.findViewById(R.id.btn_open);
             Button btn_new = (Button) v.findViewById(R.id.btn_new);
             Spinner spinner = (Spinner) v.findViewById(R.id.spinner);
-            // ini spinner ----
+            // init spinner ----
             String[] mItems = {"Select project...","Project A", "Project B", "Project C","Project C","Project C","Project C","Project C","Project C"};
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, mItems);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

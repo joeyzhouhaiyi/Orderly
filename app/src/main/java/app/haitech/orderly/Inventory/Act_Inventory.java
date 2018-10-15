@@ -1,4 +1,4 @@
-package app.haitech.orderly.Dashboard;
+package app.haitech.orderly.Inventory;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,15 +12,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import app.haitech.orderly.Inventory.Act_Inventory;
+import app.haitech.orderly.Dashboard.Act_Dashboard;
 import app.haitech.orderly.R;
 
-public class Act_Dashboard extends AppCompatActivity {
+public class Act_Inventory extends AppCompatActivity {
 
-    String TAG = "Act_Dashboard";
+    String TAG = "Act_Inventory";
 
     //models
     private DrawerLayout mDrawerLayout;
@@ -31,10 +33,12 @@ public class Act_Dashboard extends AppCompatActivity {
     //Views
     Toolbar toolbar;
     TextView ProjectName;
+    Spinner spinner_tag_filter;
+    Spinner spinner_sort;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.sty_dashboard);
+        setContentView(R.layout.sty_inventory);
         mContext=this;
         //get project name
 
@@ -50,7 +54,7 @@ public class Act_Dashboard extends AppCompatActivity {
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
         if(actionbar!= null) {
-            actionbar.setTitle("Dashboard");
+            actionbar.setTitle("Inventory");
             actionbar.setDisplayHomeAsUpEnabled(true);
             actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
@@ -60,7 +64,7 @@ public class Act_Dashboard extends AppCompatActivity {
         //Navigation Listener
         NavigationView navigationView = findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
-        ProjectName = (TextView) headerView.findViewById(R.id.projectName);//TODO: UPDATE DRAWER TITLE
+        ProjectName = (TextView) headerView.findViewById(R.id.projectName);
         if(ProjectName!=null)
             ProjectName.setText(projectName);
 
@@ -102,18 +106,21 @@ public class Act_Dashboard extends AppCompatActivity {
                     {
                         switch (checkedNavItem)
                         {
-                            case R.id.nav_inventory:
-                                Intent intent = new Intent(mContext, Act_Inventory.class);
+                            case R.id.nav_dashboard:
+                                Intent intent = new Intent(mContext, Act_Dashboard.class);
                                 intent.putExtra("projectName", projectName);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
-                                Act_Dashboard.this.finish();
+                                Act_Inventory.this.finish();
                                 break;
 
-                            case R.id.nav_tag:
-                                //Open tags management
+                            case R.id.nav_add:
+                                //Add item
                                 break;
 
+                            case R.id.nav_delete:
+                                //Remove item
+                                break;
                         }
                     }
 
@@ -145,4 +152,19 @@ public class Act_Dashboard extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     //--------------------------------------------------------------------------
+    private void initView()
+    {
+        spinner_tag_filter = (Spinner) findViewById(R.id.spinner_tag_filter);
+        spinner_sort = (Spinner)findViewById(R.id.spinner_sort);
+
+        String[] mItems_filter = {"Select Tag...","Tag A", "Tag B", "Tag C"};
+        ArrayAdapter<String> adapter_filter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, mItems_filter);
+        adapter_filter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner_tag_filter.setAdapter(adapter_filter);
+
+        String[] mItems_sort = {"ID","Time", "Value"};
+        ArrayAdapter<String> adapter_sort = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, mItems_sort);
+        adapter_sort.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner_sort.setAdapter(adapter_sort);
+    }
 }

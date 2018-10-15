@@ -14,4 +14,10 @@
     <string name="cancel">CANCEL</string>
     <string name="open">OPEN</string>
     <string name="New">NEW</string>
+    <string name="tv_hint_text">* Maximum 16 characters</string>
+    <string name="Enter_a_name">Enter a name</string>
+    <string name="inventory">Inventory</string>
+    <string name="delete_item">Delete</string>
+    <string name="add_item">Add</string>
+    <string name="dashboard">Dashboard</string>
 </resources>

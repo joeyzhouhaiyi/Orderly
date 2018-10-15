@@ -17,7 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainScreen.Act_MainScreen" />
-        <activity android:name=".Dashboard.Act_Dashboard"></activity>
+        <activity android:name=".Dashboard.Act_Dashboard" />
+        <activity android:name=".Inventory.Act_Inventory"></activity>
     </application>
 
 </manifest>
