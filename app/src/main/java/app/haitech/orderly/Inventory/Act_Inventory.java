@@ -41,7 +41,7 @@ public class Act_Inventory extends AppCompatActivity {
         setContentView(R.layout.sty_inventory);
         mContext=this;
         //get project name
-
+        initView();
         Intent intent = getIntent();
         projectName = intent.getStringExtra("projectName");
         if(!projectName.isEmpty())
@@ -157,7 +157,7 @@ public class Act_Inventory extends AppCompatActivity {
         spinner_tag_filter = (Spinner) findViewById(R.id.spinner_tag_filter);
         spinner_sort = (Spinner)findViewById(R.id.spinner_sort);
 
-        String[] mItems_filter = {"Select Tag...","Tag A", "Tag B", "Tag C"};
+        String[] mItems_filter = {"ALL","Tag A", "Tag B", "Tag C"};
         ArrayAdapter<String> adapter_filter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, mItems_filter);
         adapter_filter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner_tag_filter.setAdapter(adapter_filter);
