@@ -20,4 +20,7 @@
     <string name="delete_item">Delete</string>
     <string name="add_item">Add</string>
     <string name="dashboard">Dashboard</string>
+    <string name="tv_manage_tags">MANAGE TAGS</string>
+    <string name="close">CLOSE</string>
+    <string name="edit">EDIT</string>
 </resources>
