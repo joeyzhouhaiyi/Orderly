@@ -209,18 +209,6 @@ public class Act_Dashboard extends AppCompatActivity {
                 flowLayout.addView(bTag,i);
             }
             //--TD--
-            final ImageButton btn = new ImageButton(flowLayout.getContext());
-            btn.setImageResource(R.drawable.ic_add_circle);
-            btn.setMaxWidth(30);
-            btn.setMaxHeight(30);
-            btn.setBackgroundResource(R.drawable.states_bg_tagnum_round);
-            btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //ADD TAG
-                }
-            });
-            flowLayout.addView(btn);
         }
 
     }
