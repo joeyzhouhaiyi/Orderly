@@ -19,25 +19,33 @@ import android.view.MenuItem;
 import android.support.design.widget.NavigationView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+
+import app.haitech.orderly.DB.Project;
 import app.haitech.orderly.Dashboard.Act_Dashboard;
+import app.haitech.orderly.Dataclass;
 import app.haitech.orderly.R;
+import io.realm.Realm;
 
 public class Act_MainScreen extends AppCompatActivity
 {
     String TAG = "Act_MainScreen";
     //models
     private DrawerLayout mDrawerLayout;
-    public static String projectName = "";
     private Context mContext;
     private int checkedNavItem =0;
+    Dataclass myData = new Dataclass();
+    Realm realm;
     //Views
     Toolbar toolbar;
     TextView tv_no_project;
@@ -51,13 +59,17 @@ public class Act_MainScreen extends AppCompatActivity
         setContentView(R.layout.sty_main_screen);
         mContext=this;
         InitViews();
+        //Create DB instance
+        realm = Realm.getDefaultInstance();
+
         // Toolbar
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
-        actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
-
+        if(actionbar!=null) {
+            actionbar.setDisplayHomeAsUpEnabled(true);
+            actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        }
         //Drawer
         mDrawerLayout = findViewById(R.id.drawer_layout);
 
@@ -97,7 +109,6 @@ public class Act_MainScreen extends AppCompatActivity
                 }
         );
         boolean hasExistingProject = CheckIfHasProject();
-        //hasExistingProject=true;
         if(hasExistingProject)
         {
             CreateChooseProjectDialog();
@@ -140,9 +151,12 @@ public class Act_MainScreen extends AppCompatActivity
     //---------------------------------------------------------------------------
     public boolean CheckIfHasProject()
     {
-        // check in DB if project exist
-        //TODO
-        return false;
+        boolean res = false;
+        if(myData.getProjectCount() != 0)
+        {
+            res = true;
+        }
+        return res;
     }
     //---------------------------------------------------------------------------
     // New Project Button Clicked
@@ -174,14 +188,30 @@ public class Act_MainScreen extends AppCompatActivity
             btn_ok.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    projectName = et_proj_name.getText().toString();
-                    if (!projectName.isEmpty()) {
-                        Intent intent = new Intent(Act_MainScreen.this, Act_Dashboard.class);
-                        intent.putExtra("projectName", projectName);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                        dialog.dismiss();
-                        Act_MainScreen.this.finish();
+                    final String name = et_proj_name.getText().toString();
+                    if (!name.isEmpty()) {
+                        myData.setCurrentProjectName(name);
+                        if(myData.appendProjectName(name))
+                        {
+                            final Project newProj = new Project();
+                            newProj.setName(name);
+                            realm.executeTransactionAsync(new Realm.Transaction() {
+                                @Override
+                                public void execute(Realm realm) {
+                                    realm.copyToRealm(newProj);
+                                }
+                            });
+                            Intent intent = new Intent(Act_MainScreen.this, Act_Dashboard.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
+                            dialog.dismiss();
+                            Act_MainScreen.this.finish();
+                        }
+                        else
+                        {
+                            Toast.makeText(mContext,"Add Name Failed",Toast.LENGTH_SHORT);
+                        }
                     }else{
                         tv_hint.setText("* Name cannot be empty!");
                         tv_hint.setTextColor(getResources().getColor(R.color.red));
@@ -214,6 +244,7 @@ public class Act_MainScreen extends AppCompatActivity
     /**
      * If the project Exist, choose a project
      */
+    String selectedItem;
     private void CreateChooseProjectDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         LayoutInflater inflater = LayoutInflater.from(mContext);
@@ -227,18 +258,35 @@ public class Act_MainScreen extends AppCompatActivity
             Button btn_new = (Button) v.findViewById(R.id.btn_new);
             Spinner spinner = (Spinner) v.findViewById(R.id.spinner);
             // init spinner ----
-            String[] mItems = {"Select project...","Project A", "Project B", "Project C","Project C","Project C","Project C","Project C","Project C"};
+            ArrayList<String> mItems = myData.getProjectNameList();
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, mItems);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(adapter);
             // ----------------
 
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    selectedItem = parent.getItemAtPosition(position).toString();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
 
             // Open button callback
             btn_open.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    myData.setCurrentProjectName(selectedItem);
+                    Intent intent = new Intent(Act_MainScreen.this, Act_Dashboard.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
                     dialog.dismiss();
+                    Act_MainScreen.this.finish();
                 }
             });
 
@@ -247,8 +295,15 @@ public class Act_MainScreen extends AppCompatActivity
                 @Override
                 public void onClick(View view) {
                     dialog.dismiss();
+                    CreateNewProjectDialog();
                 }
             });
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realm.close();
     }
 }

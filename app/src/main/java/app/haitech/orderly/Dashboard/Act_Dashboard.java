@@ -14,18 +14,23 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apmem.tools.layouts.FlowLayout;
 
+import java.util.ArrayList;
+
+import app.haitech.orderly.DB.Item;
+import app.haitech.orderly.DB.Project;
+import app.haitech.orderly.Dataclass;
 import app.haitech.orderly.Inventory.Act_Inventory;
 import app.haitech.orderly.R;
+import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmResults;
 
 public class Act_Dashboard extends AppCompatActivity {
 
@@ -33,26 +38,29 @@ public class Act_Dashboard extends AppCompatActivity {
 
     //models
     private DrawerLayout mDrawerLayout;
-    public static String projectName = "";
     private Context mContext;
     private int checkedNavItem=0;
-
+    Dataclass myData = new Dataclass();
+    private Realm realm;
     //Views
     Toolbar toolbar;
     TextView ProjectName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sty_dashboard);
+        realm = Realm.getDefaultInstance();
         mContext=this;
         //get project name
-
-        Intent intent = getIntent();
-        projectName = intent.getStringExtra("projectName");
+        String projectName = myData.getCurrentProjectName();
         if(!projectName.isEmpty())
         {
             Toast.makeText(mContext, projectName+" is the new project name.", Toast.LENGTH_SHORT).show();
         }
+
+        //Init Tag List
+        InitTagList();
 
         // Toolbar
         toolbar = findViewById(R.id.toolbar);
@@ -69,7 +77,7 @@ public class Act_Dashboard extends AppCompatActivity {
         //Navigation Listener
         NavigationView navigationView = findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
-        ProjectName = (TextView) headerView.findViewById(R.id.projectName);//TODO: UPDATE DRAWER TITLE
+        ProjectName = (TextView) headerView.findViewById(R.id.projectName);
         if(ProjectName!=null)
             ProjectName.setText(projectName);
 
@@ -113,12 +121,10 @@ public class Act_Dashboard extends AppCompatActivity {
                         {
                             case R.id.nav_inventory:
                                 Intent intent = new Intent(mContext, Act_Inventory.class);
-                                intent.putExtra("projectName", projectName);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                                 Act_Dashboard.this.finish();
                                 break;
-
                             case R.id.nav_tag:
                                 createTagsManagementDialog();
                                 break;
@@ -133,6 +139,33 @@ public class Act_Dashboard extends AppCompatActivity {
                     }
                 }
         );
+    }
+    //---------------------------------------------------------------------------
+    private void InitTagList()
+    {
+        final String cp = myData.getCurrentProjectName();
+        if(cp!=null)
+        {
+            realm.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Project myProj = realm.where(Project.class).equalTo("name",cp).findFirst();
+                    if(myProj!=null)
+                    {
+                        RealmResults<Item> items = myProj.getItems().where().distinct("tag").findAll();
+                        if(!items.isEmpty())
+                        {
+                            ArrayList<String> t = new ArrayList<>();
+                            for(Item i : items)
+                            {
+                                t.add(i.getTag());
+                            }
+                            myData.setTagList(t);
+                        }
+                    }
+                }
+            });
+        }
     }
     //---------------------------------------------------------------------------
     @Override
@@ -187,29 +220,37 @@ public class Act_Dashboard extends AppCompatActivity {
         final FlowLayout flowLayout = v.findViewById(R.id.flowlayout_tags);
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if(inflater!=null) {
-            //TODO: Replace whole thing by tags
-            for (int i = 0; i < 30; i++) {
+            for (int i = 0; i < myData.getTagCount(); i++) {
                 View childView = inflater.inflate(R.layout.sty_btn_tag, null);
 
                 final LinearLayout bTag = (LinearLayout) childView.findViewById(R.id.btn_tag_style);
                 bTag.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                       //TODO Add on click behaviour, enable Edit button
+                        //TODO Add on click behaviour, enable Edit button
                         // bTag.setBackgroundResource(R.drawable.btn_square_regular_pressed);
                     }
                 });
-                TextView num = (TextView) bTag.findViewById(R.id.tv_tag_item_number);
-                TextView name = (TextView) bTag.findViewById(R.id.tv_tag_item_name);
-                num.setText("" + i);
-                if(i%3== 0)
-                    name.setText("Tag " + i*i);
-                else
-                    name.setText("Tag Name ++" + i * i *15);
-                flowLayout.addView(bTag,i);
+                final TextView num = (TextView) bTag.findViewById(R.id.tv_tag_item_number);
+                final TextView name = (TextView) bTag.findViewById(R.id.tv_tag_item_name);
+                final String tag = myData.getTagList().get(i);
+                realm.executeTransactionAsync(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        name.setText(tag);
+                        RealmResults<Item> items = realm.where(Item.class).equalTo("tag", tag).findAll();
+                        num.setText(items.size());
+                    }
+                });
+                flowLayout.addView(bTag, i);
             }
-            //--TD--
         }
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realm.close();
     }
 }

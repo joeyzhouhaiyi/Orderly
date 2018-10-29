@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import app.haitech.orderly.Dashboard.Act_Dashboard;
+import app.haitech.orderly.Dataclass;
 import app.haitech.orderly.R;
 
 public class Act_Inventory extends AppCompatActivity {
@@ -26,10 +27,9 @@ public class Act_Inventory extends AppCompatActivity {
 
     //models
     private DrawerLayout mDrawerLayout;
-    public static String projectName = "";
     private Context mContext;
     private int checkedNavItem=0;
-
+    Dataclass myData = new Dataclass();
     //Views
     Toolbar toolbar;
     TextView ProjectName;
@@ -43,7 +43,7 @@ public class Act_Inventory extends AppCompatActivity {
         //get project name
         initView();
         Intent intent = getIntent();
-        projectName = intent.getStringExtra("projectName");
+        String projectName = myData.getCurrentProjectName();
         if(!projectName.isEmpty())
         {
             Toast.makeText(mContext, projectName+" is the new project name.", Toast.LENGTH_SHORT).show();
@@ -108,7 +108,6 @@ public class Act_Inventory extends AppCompatActivity {
                         {
                             case R.id.nav_dashboard:
                                 Intent intent = new Intent(mContext, Act_Dashboard.class);
-                                intent.putExtra("projectName", projectName);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                                 Act_Inventory.this.finish();
@@ -166,5 +165,11 @@ public class Act_Inventory extends AppCompatActivity {
         ArrayAdapter<String> adapter_sort = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, mItems_sort);
         adapter_sort.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner_sort.setAdapter(adapter_sort);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
     }
 }
