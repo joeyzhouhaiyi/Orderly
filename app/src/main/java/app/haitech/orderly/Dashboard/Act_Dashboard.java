@@ -28,6 +28,7 @@ import app.haitech.orderly.DB.Project;
 import app.haitech.orderly.Dataclass;
 import app.haitech.orderly.Inventory.Act_Inventory;
 import app.haitech.orderly.R;
+import app.haitech.orderly.TagManagement.Act_TagManagement;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
@@ -123,10 +124,15 @@ public class Act_Dashboard extends AppCompatActivity {
                                 Intent intent = new Intent(mContext, Act_Inventory.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
+                                overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
                                 Act_Dashboard.this.finish();
                                 break;
                             case R.id.nav_tag:
-                                createTagsManagementDialog();
+                                Intent intent2 = new Intent(mContext, Act_TagManagement.class);
+                                intent2.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent2);
+                                overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
+                                Act_Dashboard.this.finish();
                                 break;
 
                         }
@@ -187,67 +193,6 @@ public class Act_Dashboard extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     //--------------------------------------------------------------------------
-    protected void createTagsManagementDialog()
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        View v = inflater.inflate(R.layout.sty_dialog_tag_management, null);
-        if (v != null) {
-            final AlertDialog dialog = builder.create();
-            dialog.show();
-            dialog.getWindow().setContentView(v);
-            RenderTagViews(v);
-            Button btn_close = (Button) v.findViewById(R.id.btn_close);
-            Button btn_edit = (Button) v.findViewById(R.id.btn_edit);
-            btn_close.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialog.dismiss();
-                }
-            });
-            btn_edit.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //TODO
-                }
-            });
-        }
-
-    }
-    //--------------------------------------------------------------------------
-    protected void RenderTagViews(View v)
-    {
-        final FlowLayout flowLayout = v.findViewById(R.id.flowlayout_tags);
-        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if(inflater!=null) {
-            for (int i = 0; i < myData.getTagCount(); i++) {
-                View childView = inflater.inflate(R.layout.sty_btn_tag, null);
-
-                final LinearLayout bTag = (LinearLayout) childView.findViewById(R.id.btn_tag_style);
-                bTag.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //TODO Add on click behaviour, enable Edit button
-                        // bTag.setBackgroundResource(R.drawable.btn_square_regular_pressed);
-                    }
-                });
-                final TextView num = (TextView) bTag.findViewById(R.id.tv_tag_item_number);
-                final TextView name = (TextView) bTag.findViewById(R.id.tv_tag_item_name);
-                final String tag = myData.getTagList().get(i);
-                realm.executeTransactionAsync(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        name.setText(tag);
-                        RealmResults<Item> items = realm.where(Item.class).equalTo("tag", tag).findAll();
-                        num.setText(items.size());
-                    }
-                });
-                flowLayout.addView(bTag, i);
-            }
-        }
-
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

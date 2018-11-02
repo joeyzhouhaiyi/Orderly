@@ -31,11 +31,13 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
+import app.haitech.orderly.DB.Item;
 import app.haitech.orderly.DB.Project;
 import app.haitech.orderly.Dashboard.Act_Dashboard;
 import app.haitech.orderly.Dataclass;
 import app.haitech.orderly.R;
 import io.realm.Realm;
+import io.realm.RealmList;
 
 public class Act_MainScreen extends AppCompatActivity
 {
@@ -195,6 +197,8 @@ public class Act_MainScreen extends AppCompatActivity
                         {
                             final Project newProj = new Project();
                             newProj.setName(name);
+                            RealmList<Item> items = new RealmList<>();
+                            newProj.setItems(items);
                             realm.executeTransactionAsync(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {

@@ -44,6 +44,34 @@ public final class Dataclass {
         return res;
     }
     //-------------------------------------------------------------------
+
+    /**
+     * @param newTag
+     * @return code
+     * 0  -- Error
+     * -1 -- Duplicate
+     * 1  -- Success
+     */
+    public int appendTag(String newTag)
+    {
+        int code = 0;
+        int size = tagList.size();
+        if(!tagList.contains(newTag))
+        {
+            tagList.add(newTag);
+            if(tagList.size() == ++size)
+            {
+                code = 1;
+            }
+        }
+        else
+        {
+            code = -1;
+        }
+
+        return code;
+    }
+    //-------------------------------------------------------------------
     public ArrayList<String> getProjectNameList()
     {
         return projectNameList;

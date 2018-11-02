@@ -19,7 +19,8 @@
         </activity>
         <activity android:name=".MainScreen.Act_MainScreen" />
         <activity android:name=".Dashboard.Act_Dashboard" />
-        <activity android:name=".Inventory.Act_Inventory"></activity>
+        <activity android:name=".Inventory.Act_Inventory" />
+        <activity android:name=".TagManagement.Act_TagManagement"></activity>
     </application>
 
 </manifest>
