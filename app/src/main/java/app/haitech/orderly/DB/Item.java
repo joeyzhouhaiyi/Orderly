@@ -2,7 +2,7 @@ package app.haitech.orderly.DB;
 
 import java.util.Date;
 import java.util.UUID;
-
+import app.haitech.orderly.DB.Tag;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
@@ -12,13 +12,14 @@ public class Item extends RealmObject {
     @PrimaryKey
     private String  id = UUID.randomUUID().toString();
     private String  name;
-    @Required
-    private String  tag;
+    private Tag  myTag;
     @Required
     private byte[]  barcode;
     @Required
-    private Date    date;
+    private Date    dateIn;
+    private Date    dateOut;
     private Long    value;
+    private Project fatherProject;
 
     public String getId() {
         return id;
@@ -36,12 +37,12 @@ public class Item extends RealmObject {
         this.name = name;
     }
 
-    public String getTag() {
-        return tag;
+    public Tag getMyTag() {
+        return myTag;
     }
 
-    public void setTag(String tag) {
-        this.tag = tag;
+    public void setMyTag(Tag tag) {
+        this.myTag = tag;
     }
 
     public byte[] getBarcode() {
@@ -52,12 +53,20 @@ public class Item extends RealmObject {
         this.barcode = barcode;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getDateIn() {
+        return dateIn;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setDateIn(Date date) {
+        this.dateIn = date;
+    }
+
+    public Date getDateOut() {
+        return dateOut;
+    }
+
+    public void setDateOut(Date dateOut) {
+        this.dateOut = dateOut;
     }
 
     public Long getValue() {
@@ -66,5 +75,13 @@ public class Item extends RealmObject {
 
     public void setValue(Long value) {
         this.value = value;
+    }
+
+    public Project getFatherProject() {
+        return fatherProject;
+    }
+
+    public void setFatherProject(Project fatherProject) {
+        this.fatherProject = fatherProject;
     }
 }

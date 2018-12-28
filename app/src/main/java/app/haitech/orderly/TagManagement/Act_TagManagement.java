@@ -2,7 +2,6 @@ package app.haitech.orderly.TagManagement;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,14 +12,14 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import org.apmem.tools.layouts.FlowLayout;
 
+import app.haitech.orderly.DB.DBOperations;
 import app.haitech.orderly.DB.Item;
-import app.haitech.orderly.DB.Project;
+import app.haitech.orderly.DB.ProjectLibrary;
+import app.haitech.orderly.DB.Tag;
 import app.haitech.orderly.Dashboard.Act_Dashboard;
-import app.haitech.orderly.Dataclass;
 import app.haitech.orderly.Inventory.Act_Inventory;
 import app.haitech.orderly.R;
 import io.realm.Realm;
@@ -31,15 +30,20 @@ public class Act_TagManagement extends AppCompatActivity {
 
 
     android.support.v7.widget.Toolbar toolbar;
-    Dataclass myData = new Dataclass();
-    private Realm realm;
+
     private Context mContext;
+
+    //DB related
+    private Realm realm;
+    private ProjectLibrary PL;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sty_tag_management);
         mContext = this;
         realm = Realm.getDefaultInstance();
+        PL = DBOperations.getDefaultProjectLibrary(realm);
 
         // Toolbar
         toolbar = findViewById(R.id.toolbar);
@@ -87,7 +91,9 @@ public class Act_TagManagement extends AppCompatActivity {
         final FlowLayout flowLayout = findViewById(R.id.flowlayout_tags);
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if(inflater!=null) {
-            for (int i = 0; i < myData.getTagCount(); i++) {
+            int i =0;
+            for (Tag t : PL.getCSP().getTags()) {
+                i++;
                 View childView = inflater.inflate(R.layout.sty_btn_tag, null);
 
                 final LinearLayout bTag = (LinearLayout) childView.findViewById(R.id.btn_tag_style);
@@ -100,19 +106,8 @@ public class Act_TagManagement extends AppCompatActivity {
                 });
                 final TextView num = (TextView) bTag.findViewById(R.id.tv_tag_item_number);
                 final TextView name = (TextView) bTag.findViewById(R.id.tv_tag_item_name);
-                final String tag = myData.getTagList().get(i);
-                name.setText(tag);
-                realm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        String mProj = myData.getCurrentProjectName();
-                        Project myP = realm.where(Project.class).equalTo("name",mProj).findFirst();
-                        if(myP != null)
-                        items = myP.getItems();
-
-                    }
-                });
-
+                name.setText(t.getName());
+                RealmResults<Item> items = realm.where(Item.class).equalTo("myTag.name",t.getName()).and().equalTo("fatherProject.name",PL.getCSP().getName()).findAll();
                 num.setText(items.size() + "");
                 flowLayout.addView(bTag, i);
             }
@@ -129,19 +124,22 @@ public class Act_TagManagement extends AppCompatActivity {
     // Button Click Listeners
     //-----------------------------------------------------------------------------------------
     public void OnAddTag(View view){
-        String aTag = "Tag";
-        int code = myData.appendTag(aTag);
-        if(code == 0)
+        Tag aTag = new Tag();
+        aTag.setFatherProject(PL.getCSP());
+        aTag.setName("Tag1");
+        RealmResults<Tag> tags = realm.where(Tag.class).equalTo("name",aTag.getName()).findAll();
+        if(tags.size() == 0)
         {
-            Toast.makeText(mContext,"Error, please try again..",Toast.LENGTH_SHORT).show();
+            realm.beginTransaction();
+            realm.copyToRealm(aTag);
+            PL.getCSP().getTags().add(aTag);
+            realm.commitTransaction();
+            RenderTagViews();
+            Toast.makeText(mContext,"Tag added successfully!",Toast.LENGTH_SHORT).show();
         }
-        else if (code == -1)
+        else
         {
             Toast.makeText(mContext,"The tag name exists..",Toast.LENGTH_SHORT).show();
-        }
-        else if (code == 1)
-        {
-            RenderTagViews();
         }
     }
     public void OnRemoveTag(View view)

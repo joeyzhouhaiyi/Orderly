@@ -6,32 +6,21 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apmem.tools.layouts.FlowLayout;
-
-import java.util.ArrayList;
-
-import app.haitech.orderly.DB.Item;
-import app.haitech.orderly.DB.Project;
-import app.haitech.orderly.Dataclass;
+import app.haitech.orderly.DB.DBOperations;
+import app.haitech.orderly.DB.ProjectLibrary;
 import app.haitech.orderly.Inventory.Act_Inventory;
 import app.haitech.orderly.R;
 import app.haitech.orderly.TagManagement.Act_TagManagement;
 import io.realm.Realm;
-import io.realm.RealmList;
-import io.realm.RealmResults;
 
 public class Act_Dashboard extends AppCompatActivity {
 
@@ -41,8 +30,11 @@ public class Act_Dashboard extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private Context mContext;
     private int checkedNavItem=0;
-    Dataclass myData = new Dataclass();
+
+    //DB related
     private Realm realm;
+    private ProjectLibrary PL;
+
     //Views
     Toolbar toolbar;
     TextView ProjectName;
@@ -52,16 +44,14 @@ public class Act_Dashboard extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sty_dashboard);
         realm = Realm.getDefaultInstance();
+        PL = DBOperations.getDefaultProjectLibrary(realm);
         mContext=this;
         //get project name
-        String projectName = myData.getCurrentProjectName();
+        String projectName = PL.getCSP().getName();
         if(!projectName.isEmpty())
         {
             Toast.makeText(mContext, projectName+" is the new project name.", Toast.LENGTH_SHORT).show();
         }
-
-        //Init Tag List
-        InitTagList();
 
         // Toolbar
         toolbar = findViewById(R.id.toolbar);
@@ -72,6 +62,7 @@ public class Act_Dashboard extends AppCompatActivity {
             actionbar.setDisplayHomeAsUpEnabled(true);
             actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
+
         //Drawer
         mDrawerLayout = findViewById(R.id.drawer_layout);
 
@@ -145,33 +136,6 @@ public class Act_Dashboard extends AppCompatActivity {
                     }
                 }
         );
-    }
-    //---------------------------------------------------------------------------
-    private void InitTagList()
-    {
-        final String cp = myData.getCurrentProjectName();
-        if(cp!=null)
-        {
-            realm.executeTransactionAsync(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    Project myProj = realm.where(Project.class).equalTo("name",cp).findFirst();
-                    if(myProj!=null)
-                    {
-                        RealmResults<Item> items = myProj.getItems().where().distinct("tag").findAll();
-                        if(!items.isEmpty())
-                        {
-                            ArrayList<String> t = new ArrayList<>();
-                            for(Item i : items)
-                            {
-                                t.add(i.getTag());
-                            }
-                            myData.setTagList(t);
-                        }
-                    }
-                }
-            });
-        }
     }
     //---------------------------------------------------------------------------
     @Override

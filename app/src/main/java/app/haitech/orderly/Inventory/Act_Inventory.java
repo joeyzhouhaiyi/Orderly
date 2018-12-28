@@ -17,9 +17,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import app.haitech.orderly.DB.DBOperations;
+import app.haitech.orderly.DB.ProjectLibrary;
 import app.haitech.orderly.Dashboard.Act_Dashboard;
-import app.haitech.orderly.Dataclass;
 import app.haitech.orderly.R;
+import io.realm.Realm;
 
 public class Act_Inventory extends AppCompatActivity {
 
@@ -29,7 +31,10 @@ public class Act_Inventory extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private Context mContext;
     private int checkedNavItem=0;
-    Dataclass myData = new Dataclass();
+
+    //DB related
+    ProjectLibrary PL;
+    Realm realm;
     //Views
     Toolbar toolbar;
     TextView ProjectName;
@@ -43,10 +48,12 @@ public class Act_Inventory extends AppCompatActivity {
         //get project name
         initView();
         Intent intent = getIntent();
-        String projectName = myData.getCurrentProjectName();
+        realm = Realm.getDefaultInstance();
+        PL = DBOperations.getDefaultProjectLibrary(realm);
+        String projectName = PL.getCSP().getName();
         if(!projectName.isEmpty())
         {
-            Toast.makeText(mContext, projectName+" is the new project name.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, projectName+" is the project name.", Toast.LENGTH_SHORT).show();
         }
 
         // Toolbar
@@ -170,6 +177,6 @@ public class Act_Inventory extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        realm.close();
     }
 }

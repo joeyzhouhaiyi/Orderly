@@ -1,12 +1,8 @@
 package app.haitech.orderly.MainScreen;
 
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.nfc.Tag;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -27,27 +23,29 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
-import app.haitech.orderly.DB.Item;
+import app.haitech.orderly.DB.DBOperations;
 import app.haitech.orderly.DB.Project;
+import app.haitech.orderly.DB.ProjectLibrary;
 import app.haitech.orderly.Dashboard.Act_Dashboard;
-import app.haitech.orderly.Dataclass;
 import app.haitech.orderly.R;
 import io.realm.Realm;
-import io.realm.RealmList;
+import io.realm.RealmResults;
 
 public class Act_MainScreen extends AppCompatActivity
 {
     String TAG = "Act_MainScreen";
+
     //models
     private DrawerLayout mDrawerLayout;
     private Context mContext;
     private int checkedNavItem =0;
-    Dataclass myData = new Dataclass();
+
+    //DB related
     Realm realm;
+    ProjectLibrary PL;
+
     //Views
     Toolbar toolbar;
     TextView tv_no_project;
@@ -63,6 +61,7 @@ public class Act_MainScreen extends AppCompatActivity
         InitViews();
         //Create DB instance
         realm = Realm.getDefaultInstance();
+        PL = DBOperations.getDefaultProjectLibrary(realm);
 
         // Toolbar
         toolbar = findViewById(R.id.toolbar);
@@ -154,10 +153,9 @@ public class Act_MainScreen extends AppCompatActivity
     public boolean CheckIfHasProject()
     {
         boolean res = false;
-        if(myData.getProjectCount() != 0)
-        {
+        RealmResults<Project> projects = realm.where(Project.class).findAll();
+        if(projects.size() != 0)
             res = true;
-        }
         return res;
     }
     //---------------------------------------------------------------------------
@@ -192,30 +190,23 @@ public class Act_MainScreen extends AppCompatActivity
                 public void onClick(View view) {
                     final String name = et_proj_name.getText().toString();
                     if (!name.isEmpty()) {
-                        myData.setCurrentProjectName(name);
-                        if(myData.appendProjectName(name))
-                        {
-                            final Project newProj = new Project();
-                            newProj.setName(name);
-                            RealmList<Item> items = new RealmList<>();
-                            newProj.setItems(items);
-                            realm.executeTransactionAsync(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    realm.copyToRealm(newProj);
-                                }
-                            });
-                            Intent intent = new Intent(Act_MainScreen.this, Act_Dashboard.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
-                            dialog.dismiss();
-                            Act_MainScreen.this.finish();
-                        }
-                        else
-                        {
-                            Toast.makeText(mContext,"Add Name Failed",Toast.LENGTH_SHORT);
-                        }
+
+
+                        //copy new project to realm
+                        realm.beginTransaction();
+                        Project newProject = realm.createObject(Project.class);
+                        newProject.setName(name);
+                        realm.copyToRealm(newProject);
+                        PL.setCSP(newProject);
+                        PL.getProjects().add(newProject);
+                        realm.commitTransaction();
+                        Intent intent = new Intent(Act_MainScreen.this, Act_Dashboard.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
+                        dialog.dismiss();
+                        Act_MainScreen.this.finish();
+                        Toast.makeText(mContext, "new project name "+ name + ", ID: " + newProject.getID(), Toast.LENGTH_SHORT).show();
                     }else{
                         tv_hint.setText("* Name cannot be empty!");
                         tv_hint.setTextColor(getResources().getColor(R.color.red));
@@ -261,8 +252,12 @@ public class Act_MainScreen extends AppCompatActivity
             Button btn_open = (Button) v.findViewById(R.id.btn_open);
             Button btn_new = (Button) v.findViewById(R.id.btn_new);
             Spinner spinner = (Spinner) v.findViewById(R.id.spinner);
+
             // init spinner ----
-            ArrayList<String> mItems = myData.getProjectNameList();
+
+            ArrayList<String> mItems = new ArrayList<>();
+            for (Project p: PL.getProjects())
+                mItems.add(p.getName());
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, mItems);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(adapter);
@@ -284,7 +279,10 @@ public class Act_MainScreen extends AppCompatActivity
             btn_open.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    myData.setCurrentProjectName(selectedItem);
+                    Project selectedProject = realm.where(Project.class).equalTo("name",selectedItem).findFirst();
+                    realm.beginTransaction();
+                    PL.setCSP(selectedProject);
+                    realm.commitTransaction();
                     Intent intent = new Intent(Act_MainScreen.this, Act_Dashboard.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
