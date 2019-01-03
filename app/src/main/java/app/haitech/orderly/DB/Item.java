@@ -10,7 +10,7 @@ import io.realm.annotations.Required;
 public class Item extends RealmObject {
 
     @PrimaryKey
-    private String  id = UUID.randomUUID().toString();
+    private String  id;
     private String  name;
     private Tag  myTag;
     @Required

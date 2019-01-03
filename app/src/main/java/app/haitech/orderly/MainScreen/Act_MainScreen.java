@@ -26,11 +26,14 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import app.haitech.orderly.DB.DBOperations;
+import app.haitech.orderly.DB.Item;
 import app.haitech.orderly.DB.Project;
 import app.haitech.orderly.DB.ProjectLibrary;
+import app.haitech.orderly.DB.Tag;
 import app.haitech.orderly.Dashboard.Act_Dashboard;
 import app.haitech.orderly.R;
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public class Act_MainScreen extends AppCompatActivity
@@ -196,6 +199,10 @@ public class Act_MainScreen extends AppCompatActivity
                         realm.beginTransaction();
                         Project newProject = realm.createObject(Project.class);
                         newProject.setName(name);
+                        RealmList<Tag> tags = new RealmList<>();
+                        RealmList<Item> items = new RealmList<>();
+                        newProject.setItems(items);
+                        newProject.setTags(tags);
                         realm.copyToRealm(newProject);
                         PL.setCSP(newProject);
                         PL.getProjects().add(newProject);
@@ -249,9 +256,9 @@ public class Act_MainScreen extends AppCompatActivity
             dialog.show();
             dialog.getWindow().setContentView(v);
 
-            Button btn_open = (Button) v.findViewById(R.id.btn_open);
-            Button btn_new = (Button) v.findViewById(R.id.btn_new);
-            Spinner spinner = (Spinner) v.findViewById(R.id.spinner);
+            Button btn_open = v.findViewById(R.id.btn_open);
+            Button btn_new = v.findViewById(R.id.btn_new);
+            Spinner spinner = v.findViewById(R.id.spinner);
 
             // init spinner ----
 

@@ -10,6 +10,10 @@
             android:icon="@drawable/ic_add_circle"
             android:title="@string/add_item" />
         <item
+            android:id="@+id/nav_add_debug"
+            android:icon="@drawable/ic_red_time"
+            android:title="Debug Add"/>
+        <item
             android:id="@+id/nav_delete"
             android:icon="@drawable/ic_remove_circle"
             android:title="@string/delete_item" />

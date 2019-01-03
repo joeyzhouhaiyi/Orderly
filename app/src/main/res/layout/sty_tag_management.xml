@@ -15,23 +15,56 @@
         android:background="@color/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
 
-    <ScrollView
+    <LinearLayout android:orientation="horizontal"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="8">
-        <org.apmem.tools.layouts.FlowLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            f:weightDefault="1.0"
-            android:gravity="center"
-            android:padding="15dp"
-            f:itemSpacing="30dp"
-            android:id="@+id/flowlayout_tags"
-            >
-        </org.apmem.tools.layouts.FlowLayout>
-    </ScrollView>
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        xmlns:android="http://schemas.android.com/apk/res/android">
 
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/tv_tagName"
+            android:textColor="@color/black"
+            android:text="[Tag Name]"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:textSize="14sp"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/tv_numItems"
+            android:textColor="@color/black"
+            android:text="[# Items]"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:textSize="14sp"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/tv_totalValue"
+            android:textColor="@color/black"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:text="[Total Value]"
+            android:textSize="14sp"/>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_weight="8"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/recyclerview_tag"
+        android:orientation="vertical">
+
+    </android.support.v7.widget.RecyclerView>
+
+    </RelativeLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
